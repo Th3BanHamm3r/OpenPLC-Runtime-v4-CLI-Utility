@@ -7,9 +7,8 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-# --- Configuration ---
-BASE_URL = "https://127.0.0.1:8443"
-API_URL = f"{BASE_URL}/api"
+BASE_URL = ""
+API_URL = ""
 
 def login(session, username, password):
     login_url = f"{API_URL}/login"
@@ -198,6 +197,7 @@ Usage:
   python3 plc4.py [global options] <command> [command options]
 
 Global Options (must precede the command):
+  -l, --url <runtime_URL>    Web location of an active Runtime
   -u, --user <username>      Username for login
   -p, --password <password>  Password for login
   -h, --help                 Show this help message and exit
@@ -227,53 +227,49 @@ Available Commands:
                     Usage: python3 plc4.py plugin-command <plugin_name> <command> ['{"param1":"val1"}']
 
 Examples:
-  python3 plc4.py create-user admin admin
-  python3 plc4.py -u admin -p admin start
-  python3 plc4.py -u admin -p admin upload my_prog.zip --clean
-  python3 plc4.py -u admin -p admin plugin-command ethercat status""")
+  python3 plc4.py -l https://192.168.1.50:8443 -u admin -p admin create-user admin admin
+  python3 plc4.py -l https://192.168.1.50:8443 -u admin -p admin start
+  python3 plc4.py -l https://192.168.1.50:8443 -u admin -p admin upload my_prog.zip --clean
+  python3 plc4.py -l https://192.168.1.50:8443 -u admin -p admin plugin-command ethercat status""")
 
 def main():
+    global BASE_URL, API_URL
     args = sys.argv[1:]
     if not args or '-h' in args or '--help' in args:
         print_help()
         sys.exit(0)
-    first_command = next((arg for arg in args if not arg.startswith('-')), None)
-    if first_command == 'create-user':
-        try:
-            command_index = args.index('create-user')
-            create_user_args = args[command_index+1:]
-            if len(create_user_args) < 2:
-                print("Error: create-user requires at least <username> and <password>.", file=sys.stderr)
-                sys.exit(1)
-            create_user(create_user_args[0], create_user_args[1], create_user_args[2] if len(create_user_args) > 2 else "user")
-            sys.exit(0)
-        except ValueError:
-            pass
     username = ''
     password = ''
+    url=''
     command = None
     command_args = []
     i = 0
     while i < len(args):
-        if args[i] in ('-u', '--user'):
-            if i + 1 < len(args):
-                username = args[i+1]
-                i += 2
-            else:
-                print("Error: --user requires a username argument.", file=sys.stderr)
-                sys.exit(1)
-        elif args[i] in ('-p', '--password'):
-            if i + 1 < len(args):
-                password = args[i+1]
-                i += 2
-            else:
-                print("Error: --password requires a password argument.", file=sys.stderr)
-                sys.exit(1)
+        arg = args[i]
+        if arg in ('-l', '--url'):
+            if i + 1 < len(args): custom_url = args[i+1]; i += 2;
+            else: print("Error: --url requires a target URL argument.", file=sys.stderr); sys.exit(1)
+        elif arg in ('-u', '--user'):
+            if i + 1 < len(args): username = args[i+1]; i += 2;
+            else: print("Error: --user requires an argument.", file=sys.stderr); sys.exit(1)
+        elif arg in ('-p', '--password'):
+            if i + 1 < len(args): password = args[i+1]; i += 2;
+            else: print("Error: --password requires an argument.", file=sys.stderr); sys.exit(1)
         else:
-            command = args[i].lower()
+            command = arg.lower()
             command_args = args[i+1:]
             break
 
+    BASE_URL = custom_url.rstrip('/')
+    API_URL = f"{BASE_URL}/api"
+
+    if command == 'create-user':
+        if len(command_args) < 2:
+            print("Error: create-user requires at least <username> and <password>.", file=sys.stderr)
+            sys.exit(1)
+        create_user(command_args[0], command_args[1], command_args[2] if len(command_args) > 2 else "user")
+        sys.exit(0)
+        
     if not command:
         print("Error: No command provided.", file=sys.stderr)
         print_help()

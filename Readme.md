@@ -12,18 +12,16 @@ Last tested with Runtime **v4.1.3**
 
 ## Installation
 1.  **Prerequisites:** Python 3.x is required.
-2.  **Dependencies:** The script requires the `requests` library. You can create a `requirements.txt` file and install the dependency using pip.
-
-    **Installation command:**
+2.  **Dependencies:** The script requires the `requests` library. You can install the dependency using pip.
     ```bash
     pip install requests
     ```
 
 ## Usage
-See Autonomy Logic's installation guide for [OpenPLCv4 Runtime](https://github.com/Autonomy-Logic/openplc-runtime). After initial setup, a user must be created first. This can be done through the [OpenPLC Editor](https://github.com/Autonomy-Logic/openplc-editor) or via: 
+See Autonomy Logic's installation guide for [OpenPLCv4 Runtime](https://github.com/Autonomy-Logic/openplc-runtime). After initial setup a user must first be created. This can be done through the [OpenPLC Editor](https://github.com/Autonomy-Logic/openplc-editor) or via: 
 
 ```
-python3 plc4.py create-user <username> <password>
+python3 plc4.py -l <URL> create-user <username> <password>
 ```
 For all other commands after user creation, credentials must be provided.
 ```
@@ -31,14 +29,15 @@ python3 plc4.py [global options] <command> [command options]
 ```
 These options must precede the command:
 
-    -u, --user <username>: Username for API login.
-    -p, --password <password>: Password for API login.
-    -h, --help: Show the help message and exit.
+    -l, --url <full URL path>  Web location of an active Runtime.
+    -u, --user <username>      Username for API login.
+    -p, --password <password>  Password for API login.
+    -h, --help                 Show the help message and exit.
 
 Available Commands:
 ```
 create-user:    Creates a new user account.
-                Usage: python3 plc4.py create-user <username> <password> [role]
+                Usage: python3 plc4.py [global options] create-user <username> <password> [role]
 get-users:      Lists all registered users.
 version:        Gets the OpenPLC version.
 start:          Starts the PLC program.
@@ -46,28 +45,31 @@ stop:           Stops the PLC program.
 status:         Gets the current status of the PLC.
                 Options: --stats (Includes detailed timing statistics)
 compilation:    Gets the status and logs of the last compilation.
-                Usage: python3 plc4.py compilation [output_file.log]
+                Usage: python3 plc4.py [global options] compilation [output_file.log]
 logs:           Fetches the latest runtime logs.
-                Usage: python3 plc4.py logs [output_file.log]
+                Usage: python3 plc4.py [global options] logs [output_file.log]
 upload:         Uploads a new PLC program (.zip file).
-                Usage: python3 plc4.py upload <file_path> [--clean]
+                Usage: python3 plc4.py [global options] upload <file_path> [--clean]
                 Options: --clean (Wipes compilation caches for a clean build)
 plugin-command: Sends a command to a specific plugin.
-                Usage: python3 plc4.py plugin-command <plugin_name> <command> ['{"param1":"val1"}']
+                Usage: python3 plc4.py [global options] plugin-command <plugin_name> <command> ['{"param1":"val1"}']
 ```
 
 ## Scripting Example
-This is an example bash script that executes initialization and setup instructions for the OpenPLC Runtime v4. An example `Blinky_Relay_PLC.zip` program has been provided.
+This is an example bash script that executes initialization and setup instructions for the OpenPLC Runtime v4. An example `Relay_Blink_PLC.zip` program has been provided.
 ```bash
 PLC_USER="admin"
 PLC_PASS="admin"
-python3 plc4.py create-user "$PLC_USER" "$PLC_PASS"
-python3 plc4.py -u "$PLC_USER" -p "$PLC_PASS" get-users
-python3 plc4.py -u "$PLC_USER" -p "$PLC_PASS" version
-python3 plc4.py -u "$PLC_USER" -p "$PLC_PASS" upload "$PROGRAM_NAME.zip" --clean
+ULR="https://127.0.0.1:8443"
+PROGRAM="Relay_Blink_PLC.zip"
+
+python3 plc4.py -l "$URL" create-user "$PLC_USER" "$PLC_PASS"
+python3 plc4.py -l "$URL" -u "$PLC_USER" -p "$PLC_PASS" get-users
+python3 plc4.py -l "$URL" -u "$PLC_USER" -p "$PLC_PASS" version
+python3 plc4.py -l "$URL" -u "$PLC_USER" -p "$PLC_PASS" upload "$PROGRAM" --clean
 sleep 10 # Allow time for server-side compilation
-python3 plc4.py -u "$PLC_USER" -p "$PLC_PASS" start
-python3 plc4.py -u "$PLC_USER" -p "$PLC_PASS" status --stats
+python3 plc4.py -l "$URL" -u "$PLC_USER" -p "$PLC_PASS" start
+python3 plc4.py -l "$URL" -u "$PLC_USER" -p "$PLC_PASS" status --stats
 ```
 
 ## Uploading Logic to Runtime
