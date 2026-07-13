@@ -2,13 +2,14 @@
 
 ## Overview
 The **OpenPLC Runtime v4 CLI Utility** is a Python-based Command-Line Interface (CLI) and REST API Client designed for orchestrating, automating, and managing an OpenPLCv4 Runtime environment via CLI. Key features include:
-*   User management (create, list)
-*   PLC control (start, stop)
-*   Program deployment (upload)
-*   Status and log retrieval (version, status, logs, compilation status)
-*   Plugin interaction
+*   **User Management:** Create, list, retrieve, update passwords, and delete users.
+*   **PLC Control:** Start, stop, and ping the runtime.
+*   **Program Deployment:** Upload compiled logic.
+*   **Status & Log Retrieval:** Version, status, logs, compilation status, and serial port queries.
+*   **Plugin Interaction:** Send direct JSON commands to active plugins.
+*   **Session Management:** Automatically handles authentication and gracefully logs out / revokes JWT tokens after every command completion.
 
-Last tested with Runtime **v4.1.3**
+Last tested with Runtime **v4.1.7**
 
 ## Installation
 1.  **Prerequisites:** Python 3.x is required.
@@ -37,22 +38,30 @@ These options must precede the command:
 Available Commands:
 ```
 create-user:    Creates a new user account.
-                Usage: python3 plc4.py [global options] create-user <username> <password> [role]
+                  Usage: python3 plc4.py create-user <username> <password> [role]
 get-users:      Lists all registered users.
+get-user:       Get info for a specific user ID.
+                  Usage: python3 plc4.py [global options] get-user <user_id>
+delete-user:    Delete a user by ID.
+                  Usage: python3 plc4.py [global options] delete-user <user_id>
+passwd:         Change the password for a specific user.
+                  Usage: python3 plc4.py [global options] passwd <user_id> <old_password> <new_password>
 version:        Gets the OpenPLC version.
 start:          Starts the PLC program.
 stop:           Stops the PLC program.
+ping:           Check if the runtime is responsive.
+serial:         List available serial ports on the runtime device.
 status:         Gets the current status of the PLC.
-                Options: --stats (Includes detailed timing statistics)
+                  Options: --stats (Includes detailed timing statistics)
 compilation:    Gets the status and logs of the last compilation.
-                Usage: python3 plc4.py [global options] compilation [output_file.log]
+                  Usage: python3 plc4.py [global options] compilation [output_file.log]
 logs:           Fetches the latest runtime logs.
-                Usage: python3 plc4.py [global options] logs [output_file.log]
+                  Usage: python3 plc4.py [global options] logs [output_file.log]
 upload:         Uploads a new PLC program (.zip file).
-                Usage: python3 plc4.py [global options] upload <file_path> [--clean]
-                Options: --clean (Wipes compilation caches for a clean build)
+                  Usage: python3 plc4.py [global options] upload <file_path> [--clean]
+                  Options: --clean (Wipes compilation caches for a clean build)
 plugin-command: Sends a command to a specific plugin.
-                Usage: python3 plc4.py [global options] plugin-command <plugin_name> <command> ['{"param1":"val1"}']
+                  Usage: python3 plc4.py [global options] plugin-command <plugin_name> <command> ['{"param1":"val1"}']
 ```
 
 ## Scripting Example
