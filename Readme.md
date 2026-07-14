@@ -9,7 +9,7 @@ The **OpenPLC Runtime v4 CLI Utility** is a Python-based Command-Line Interface 
 *   **Plugin Interaction:** Send direct JSON commands to active plugins.
 *   **Session Management:** Automatically handles authentication and gracefully logs out / revokes JWT tokens after every command completion.
 
-Last tested with Runtime **v4.1.7**
+Last tested with Runtime **v4.1.8**
 
 ## Installation
 1.  **Prerequisites:** Python 3.x is required.
@@ -19,7 +19,7 @@ Last tested with Runtime **v4.1.7**
     ```
 
 ## Usage
-See Autonomy Logic's installation guide for [OpenPLCv4 Runtime](https://github.com/Autonomy-Logic/openplc-runtime). After initial setup a user must first be created. This can be done through the [OpenPLC Editor](https://github.com/Autonomy-Logic/openplc-editor) or via: 
+See Autonomy Logic's installation guide for [OpenPLCv4 Runtime](https://github.com/Autonomy-Logic/openplc-runtime). After initial setup, a user must first be created. This can be done through the [OpenPLC Editor](https://github.com/Autonomy-Logic/openplc-editor) or via: 
 
 ```
 python3 plc4.py -l <URL> create-user <username> <password>
@@ -65,7 +65,7 @@ plugin-command: Sends a command to a specific plugin.
 ```
 
 ## Scripting Example
-This is an example bash script that executes initialization and setup instructions for the OpenPLC Runtime v4. An example `Relay_Blink_PLC.zip` program has been provided.
+This is an example `bash` script that executes initialization and setup instructions for the OpenPLC Runtime v4. An example `Relay_Blink_PLC` program has been provided. The `.tar.gz` includes the example OpenPLC Editor project as well as the `.zip` built version of said project. The `.zip` is used for automated deployment.
 ```bash
 PLC_USER="admin"
 PLC_PASS="admin"
@@ -82,13 +82,13 @@ python3 plc4.py -l "$URL" -u "$PLC_USER" -p "$PLC_PASS" status --stats
 ```
 
 ## Uploading Logic to Runtime
-When deploying logic on OpenPLC Runtime v4 the standard method for doing so is through the [OpenPLC Editor](https://github.com/Autonomy-Logic/openplc-editor). However, When deploying via this script the logic must already be compiled specifically for the runtime. 
+When deploying logic on OpenPLC Runtime v4 the standard method for doing so is through the [OpenPLC Editor](https://github.com/Autonomy-Logic/openplc-editor). However, when deploying logic via this script, the logic must already be built specifically for the specified runtime. To zip a built project:
 * Open or create a program in OpenPLC Editor.
-* Connect to the Runtime in the program's `Configuration`.
-* Run `Clean Build and Upload` in the left tool bar.
+* Connect to the Runtime in the Editor's `Configuration`.
+* Run `Clean Build and Upload` in the left toolbar.
 
-In the project's directory, everything in `./build/OpenPLC Runtime v4/src` will become the uploadable `.zip`.\
-   ⚠️ Note: If an upload is unsuccessful, the PLC `status` command will show as `EMPTY`. The `compilation` command can also extract the last compile log for error checking/verification if needed.
+A `Compilation complete` in the Editor console confirms that the program will work on the specified configuration. In the project's directory, everything in `./build/OpenPLC Runtime v4/src` will become the uploadable `.zip`.  
+&emsp;&emsp;⚠️ Note: If an upload is unsuccessful, the PLC `status` command will show as `EMPTY`. The `compilation` command can also extract the last compile log for error checking/verification if needed.
 
 A typical `program.zip` will look like:
 
